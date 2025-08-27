@@ -12,7 +12,7 @@ import (
 func main() {
 	s := Server{
 		Port: 6060,
-		DB:   db.InMemoryDB{},
+		DB:   db.CreateInMemoryDB(),
 	}
 	addr := fmt.Sprintf(":%d", s.Port)
 	router := gin.Default()

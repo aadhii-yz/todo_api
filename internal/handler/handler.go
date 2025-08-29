@@ -1,9 +1,22 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/aadhii-yz/todo_api/internal/db"
+	"github.com/gin-gonic/gin"
+)
 
-func GetAllTodos(ctx *gin.Context) {}
-func GetTodoById(ctx *gin.Context) {}
-func PostTodo(ctx *gin.Context)    {}
-func PatchTodo(ctx *gin.Context)   {}
-func DeleteTodo(ctx *gin.Context)  {}
+type Handler struct {
+	DB db.TodoStorage
+}
+
+func NewHandler(db db.TodoStorage) *Handler {
+	return &Handler{
+		DB: db,
+	}
+}
+
+func (h *Handler) GetAllTodos(ctx *gin.Context) {}
+func (h *Handler) GetTodoById(ctx *gin.Context) {}
+func (h *Handler) PostTodo(ctx *gin.Context)    {}
+func (h *Handler) PatchTodo(ctx *gin.Context)   {}
+func (h *Handler) DeleteTodo(ctx *gin.Context)  {}

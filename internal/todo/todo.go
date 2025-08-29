@@ -11,8 +11,6 @@ type Todo struct {
 	Completed bool   `json:"done"`
 }
 
-type Todos []Todo
-
 func CreateTodo(task string) Todo {
 	return Todo{Task: task}
 }
@@ -35,4 +33,10 @@ func (t *Todo) ToJSON() ([]byte, error) {
 
 func (t *Todo) FromJSON(b []byte) error {
 	return json.Unmarshal(b, t)
+}
+
+type Todos []Todo
+
+func (ts Todos) ToJSON() ([]byte, error) {
+	return json.Marshal(ts)
 }

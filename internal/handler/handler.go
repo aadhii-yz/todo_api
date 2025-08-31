@@ -8,6 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func HandleErr(err error, ctx *gin.Context, statusCode int) {
+	ctx.JSON(statusCode, gin.H{
+		"error": err.Error(),
+	})
+}
+
 type Handler struct {
 	DB db.TodoStorage
 }
@@ -23,7 +29,7 @@ func (h *Handler) GetAllTodos(ctx *gin.Context) {
 
 	todosJSON, err := todos.ToJSON()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		HandleErr(err, ctx, http.StatusInternalServerError)
 		return
 	}
 
@@ -35,25 +41,19 @@ func (h *Handler) GetAllTodos(ctx *gin.Context) {
 func (h *Handler) GetTodoById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		HandleErr(err, ctx, http.StatusInternalServerError)
 		return
 	}
 
 	todo, err := h.DB.GetById(id)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		HandleErr(err, ctx, http.StatusInternalServerError)
 		return
 	}
 
 	todoJSON, err := todo.ToJSON()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		HandleErr(err, ctx, http.StatusInternalServerError)
 		return
 	}
 

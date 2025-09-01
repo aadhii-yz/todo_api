@@ -39,13 +39,13 @@ func (h *Handler) GetTodoById(ctx *gin.Context) {
 		return
 	}
 
-	todo, err := h.DB.GetById(id)
+	t, err := h.DB.GetById(id)
 	if err != nil {
 		HandleErr(err, ctx, http.StatusInternalServerError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, todo)
+	ctx.JSON(http.StatusOK, t)
 }
 
 // POST /todos
@@ -63,6 +63,31 @@ func (h *Handler) PostTodo(ctx *gin.Context) {
 
 // PATCH /todos/:id
 func (h *Handler) PatchTodo(ctx *gin.Context) {
+	var t todo.Todo
+
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		HandleErr(err, ctx, http.StatusInternalServerError)
+		return
+	}
+
+	if err := ctx.BindJSON(&t); err != nil {
+		HandleErr(err, ctx, http.StatusBadRequest)
+		return
+	}
+
+	if _, err := h.DB.GetById(id); err != nil {
+		HandleErr(err, ctx, http.StatusNotFound)
+		return
+	}
+
+	if err := h.DB.Patch(id, t); err != nil {
+		HandleErr(err, ctx, http.StatusInternalServerError)
+		return
+	}
+
+	t.Id = id
+	ctx.JSON(http.StatusOK, t)
 }
 
 // DELETE /todos/:id

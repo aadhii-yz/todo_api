@@ -76,13 +76,8 @@ func (h *Handler) PatchTodo(ctx *gin.Context) {
 		return
 	}
 
-	if _, err := h.DB.GetById(id); err != nil {
-		HandleErr(err, ctx, http.StatusNotFound)
-		return
-	}
-
 	if err := h.DB.Patch(id, t); err != nil {
-		HandleErr(err, ctx, http.StatusInternalServerError)
+		HandleErr(err, ctx, http.StatusNotFound)
 		return
 	}
 
@@ -92,4 +87,14 @@ func (h *Handler) PatchTodo(ctx *gin.Context) {
 
 // DELETE /todos/:id
 func (h *Handler) DeleteTodo(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		HandleErr(err, ctx, http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.DB.DeleteById(id); err != nil {
+		HandleErr(err, ctx, http.StatusNotFound)
+		return
+	}
 }

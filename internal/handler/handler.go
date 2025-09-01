@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/aadhii-yz/todo_api/internal/db"
+	"github.com/aadhii-yz/todo_api/internal/todo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,20 +25,13 @@ func NewHandler(db db.TodoStorage) *Handler {
 	}
 }
 
+// GET /todos
 func (h *Handler) GetAllTodos(ctx *gin.Context) {
 	todos := h.DB.GetAll()
-
-	todosJSON, err := todos.ToJSON()
-	if err != nil {
-		HandleErr(err, ctx, http.StatusInternalServerError)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"todos": string(todosJSON),
-	})
+	ctx.JSON(http.StatusOK, todos)
 }
 
+// GET /todos/:id
 func (h *Handler) GetTodoById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -51,15 +45,26 @@ func (h *Handler) GetTodoById(ctx *gin.Context) {
 		return
 	}
 
-	todoJSON, err := todo.ToJSON()
-	if err != nil {
-		HandleErr(err, ctx, http.StatusInternalServerError)
+	ctx.JSON(http.StatusOK, todo)
+}
+
+// POST /todos
+func (h *Handler) PostTodo(ctx *gin.Context) {
+	var t todo.Todo
+	if err := ctx.BindJSON(&t); err != nil {
+		HandleErr(err, ctx, http.StatusBadRequest)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"todo": string(todoJSON)})
+	id := h.DB.Post(t)
+	t.Id = id
+	ctx.JSON(http.StatusOK, t)
 }
 
-func (h *Handler) PostTodo(ctx *gin.Context)   {}
-func (h *Handler) PatchTodo(ctx *gin.Context)  {}
-func (h *Handler) DeleteTodo(ctx *gin.Context) {}
+// PATCH /todos/:id
+func (h *Handler) PatchTodo(ctx *gin.Context) {
+}
+
+// DELETE /todos/:id
+func (h *Handler) DeleteTodo(ctx *gin.Context) {
+}
